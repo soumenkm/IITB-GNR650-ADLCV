@@ -140,7 +140,7 @@ class ViTTrainer:
         print(f"Finetuning efficiency: {total_trainable_params/total_params*100:.2f}%")
         
     def train(self) -> None:
-        layers_list = ["classifier"]
+        layers_list = ["all"]
         self._unfreeze_layers(layers_list=layers_list)
         self.train_step = 0
         self.test_step = 0
@@ -169,7 +169,7 @@ def main(model_name: str, device: torch.device) -> None:
         "clip_grad_norm_value": 10.0,
         "initial_learning_rate": 0.0001, 
         "weight_decay": 0.1,
-        "ckpt_key": "denoise_cls_alt",
+        "ckpt_key": "denoise_all_alt",
         "calc_norm": True,
         "wandb_log": True
     }
