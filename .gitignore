@@ -1,0 +1,12 @@
+Assignment1/data
+Assignment1/turtle_tasks
+Assignment1/gnr-650-assignment-1
+*.out
+*.npz
+Assignment1/outputs/ckpt*
+wandb
+*.log
+*.json
+.vscode
+__pycache__
+__MACOSX
