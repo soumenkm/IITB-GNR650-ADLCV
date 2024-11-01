@@ -4,9 +4,16 @@ Assignment1/gnr-650-assignment-1
 *.out
 *.npz
 Assignment1/outputs/ckpt*
+Assignment1/out
+Assignment2/data/Animals_with_Attributes2
+Assignment2/data/visual_features/*.pkl
+Assignment2/data/xlsa17
+Assignment2/class-norm
 wandb
 *.log
 *.json
 .vscode
 __pycache__
 __MACOSX
+*.zip
+orig.py
