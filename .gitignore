@@ -17,3 +17,4 @@ __pycache__
 __MACOSX
 *.zip
 orig.py
+Project/outputs/ckpt
