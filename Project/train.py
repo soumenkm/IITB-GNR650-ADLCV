@@ -1,6 +1,4 @@
 import os, json, pickle, torch
-if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 torch.manual_seed(42)
 from pathlib import Path
 import wandb
