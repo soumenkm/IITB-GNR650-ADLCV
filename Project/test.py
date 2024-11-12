@@ -1,5 +1,4 @@
-import torch, pickle, os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+import torch, pickle, os, argparse
 from transformers import Trainer, DefaultDataCollator, TrainingArguments
 import numpy as np
 from pathlib import Path
@@ -65,9 +64,21 @@ def evaluate_model(device: torch.device, config_path: Path, checkpoint_name: str
 
 # Example usage
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Evaluate a model with user-specified configuration and checkpoint.")
+
+    # Arguments for the device and paths
+    parser.add_argument("--config_path", type=str, default="Project/outputs/ckpt/dinov2-base_finetune/lora_0.10_1.0e-05_r8/master_config.pkl", help="Path to the model configuration file.")
+    parser.add_argument("--checkpoint_name", type=str, default="checkpoint-200/pytorch_model.bin", help="Name of the checkpoint file.")
+
+    args = parser.parse_args()
+    print(args)
+    
+    # Set the device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    config_path = Path(Path.cwd(), "Project/outputs/ckpt/dinov2-base_finetune/lora_0.10_1.0e-05_r8/master_config.pkl")
-    checkpoint_name = "checkpoint-200/pytorch_model.bin"
+    print(f"Using {device}...")
+    
+    config_path = Path(Path.cwd(), args.config_path)
+    checkpoint_name = args.checkpoint_name
     
     evaluate_results = evaluate_model(device=device, config_path=config_path, checkpoint_name=checkpoint_name)
     print("Test Accuracy:", evaluate_results['eval_accuracy'])

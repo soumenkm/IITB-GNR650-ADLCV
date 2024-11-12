@@ -1,4 +1,4 @@
-import os, json, pickle, torch
+import os, json, pickle, torch, argparse
 torch.manual_seed(42)
 from pathlib import Path
 import wandb
@@ -149,30 +149,65 @@ class FineTuner:
         print(self.model)
         print(self.model.calc_num_params())
         self.trainer.train(resume_from_checkpoint=False)
-
-def main(device: torch.device) -> None:
+    
+def main(device: torch.device, args) -> None:
     config = {
-        "model_name": "facebook/dinov2-base", # Currently only dinov2 model is supported!
-        "finetune_type": "layer", # ["lora", "layer"]
-        "lora_rank": 8, "lora_alpha": 16, "lora_linear_names": ["query", "key", "value", "dense"], # Needed only for LoRA
-        "last_num_layers": 2, # Needed only for layer finetuning
-        "num_epochs": 20, "num_steps": None, "batch_size": 16,  # steps are auto calculated
-        "frac": 1.0, "num_classes": 51, 
-        "initial_lr": 1e-5,  "max_grad_norm": 10.0, "weight_decay": 0.1,
-        "adam_betas": (0.95, 0.999), "grad_acc_steps": 1, "num_ckpt_per_epoch": 1,
-        "wandb_log": True
+        "model_name": args.model_name,
+        "finetune_type": args.finetune_type,
+        "lora_rank": args.lora_rank,
+        "lora_alpha": args.lora_alpha,
+        "lora_linear_names": args.lora_linear_names.split(","),
+        "last_num_layers": args.last_num_layers,
+        "num_epochs": args.num_epochs,
+        "num_steps": args.num_steps,
+        "batch_size": args.batch_size,
+        "frac": args.frac,
+        "num_classes": args.num_classes,
+        "initial_lr": args.initial_lr,
+        "max_grad_norm": args.max_grad_norm,
+        "weight_decay": args.weight_decay,
+        "adam_betas": (args.adam_beta1, args.adam_beta2),
+        "grad_acc_steps": args.grad_acc_steps,
+        "num_ckpt_per_epoch": args.num_ckpt_per_epoch,
+        "wandb_log": args.wandb_log
     }
+
     trainer = FineTuner(device=device, config=config)
     trainer.train()
+    
     # out = FineTuner.load_model(
     #     device="cuda", 
     #     config_path=Path(Path.cwd(), "Project/outputs/ckpt/dinov2-base_finetune/layer_0.10_1.0e-05/master_config.pkl"),
     #     checkpoint_name="checkpoint-100/pytorch_model.bin"
     # )
     # print(out)
-    
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Fine-tune a model with user-specified parameters.")
+
+    parser.add_argument("--model_name", type=str, default="facebook/dinov2-base", help="Name of the model to fine-tune.")
+    parser.add_argument("--finetune_type", type=str, choices=["lora", "layer"], default="lora", help="Type of fine-tuning to use.")
+    parser.add_argument("--lora_rank", type=int, default=8, help="Rank for LoRA.")
+    parser.add_argument("--lora_alpha", type=int, default=16, help="Alpha for LoRA.")
+    parser.add_argument("--lora_linear_names", type=str, default="query,key,value,dense", help="Comma-separated list of linear layer names for LoRA.")
+    parser.add_argument("--last_num_layers", type=int, default=2, help="Number of last layers for layer fine-tuning.")
+    parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs.")
+    parser.add_argument("--num_steps", type=int, default=None, help="Number of steps (auto-calculated if None).")
+    parser.add_argument("--batch_size", type=int, default=16, help="Batch size.")
+    parser.add_argument("--frac", type=float, default=1.0, help="Fraction of data to use.")
+    parser.add_argument("--num_classes", type=int, default=51, help="Number of classes.")
+    parser.add_argument("--initial_lr", type=float, default=1e-5, help="Initial learning rate.")
+    parser.add_argument("--max_grad_norm", type=float, default=10.0, help="Maximum gradient norm.")
+    parser.add_argument("--weight_decay", type=float, default=0.1, help="Weight decay.")
+    parser.add_argument("--adam_beta1", type=float, default=0.95, help="Beta1 for Adam optimizer.")
+    parser.add_argument("--adam_beta2", type=float, default=0.999, help="Beta2 for Adam optimizer.")
+    parser.add_argument("--grad_acc_steps", type=int, default=1, help="Gradient accumulation steps.")
+    parser.add_argument("--num_ckpt_per_epoch", type=int, default=1, help="Number of checkpoints per epoch.")
+    parser.add_argument("--wandb_log", type=bool, default=True, help="Enable logging to Weights and Biases.")
+
+    args = parser.parse_args()
+    print(args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using {device}...")
     
-    main(device=device)
+    main(device=device, args=args)

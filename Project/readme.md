@@ -46,7 +46,24 @@ Modify parameters in the `config` dictionary in `main()` function of `train.py` 
 Use the following command to train the model:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 python Project/train.py
+CUDA_VISIBLE_DEVICES=0 python Project/train.py \
+    --model_name "facebook/dinov2-base" \
+    --finetune_type "lora" \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --lora_linear_names "query,key,value,dense" \
+    --num_epochs 20 \
+    --batch_size 16 \
+    --frac 1.0 \
+    --num_classes 51 \
+    --initial_lr 1e-5 \
+    --max_grad_norm 10.0 \
+    --weight_decay 0.1 \
+    --adam_beta1 0.95 \
+    --adam_beta2 0.999 \
+    --grad_acc_steps 1 \
+    --num_ckpt_per_epoch 1 \
+    --wandb_log True
 ```
 
 ### Evaluating the Model
@@ -58,17 +75,12 @@ To evaluate the model on the test dataset, you can use the provided `evaluate_mo
    Ensure you have a configuration file (`master_config.pkl`) and a saved checkpoint (e.g., `checkpoint-100/pytorch_model.bin`) from your training process.
 
 2. **Run Evaluation**:
-   Change the following code snippet in `test.py` to run the evaluation:
+   Use the following command to test the model:
 
-   ```python
-   config_path = Path(Path.cwd(), "Project/outputs/ckpt/dinov2-base_finetune/lora_0.10_1.0e-05_r8/master_config.pkl")
-   checkpoint_name = "checkpoint-200/pytorch_model.bin"
-    ```
-
-    Use the following command to test the model:
-
-    ```bash
-    CUDA_VISIBLE_DEVICES=0 python Project/test.py
+   ```bash
+    CUDA_VISIBLE_DEVICES=0 python Project/test.py \
+    --config_path "Project/outputs/ckpt/dinov2-base_finetune/lora_0.10_1.0e-05_r8/master_config.pkl" \
+    --checkpoint_name "checkpoint-200/pytorch_model.bin"
     ```
 
 ### Using Other Models
