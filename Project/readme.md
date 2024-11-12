@@ -1,5 +1,6 @@
 # Vision Model Fine-Tuning with MillionAID Dataset
 
+GitHub Link: [GitHub](https://github.com/soumenkm/IITB-GNR650-ADLCV/tree/main/Project)
 This project fine-tunes a Vision Transformer model (e.g., DINOv2) with LoRA (Low-Rank Adaptation) and layer unfreezing techniques on the MillionAID dataset. The model classifies images across 51 classes, and the training process is facilitated using the Hugging Face Transformers library.
 
 ## Table of Contents
